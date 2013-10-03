@@ -52,6 +52,14 @@ var tests = []testset {
 		[][]string{[]string{}, []string{"B"}, []string{}, []string{"A"}},
 		[]string{"B,A"},
 	},
+	{
+		[][]string{},
+		[]string{""},
+	},
+	{
+		[][]string{[]string{}},
+		[]string{""},
+	},
 }
 
 func TestGetCartesianProduct(t *testing.T){

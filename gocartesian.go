@@ -16,7 +16,13 @@ func cartesianMaker(s [][]string, results *[][]string) (permute func(arr []strin
     
     return func(arr []string, n int) {
 
-        // Empty sets break recursion, handle them
+        // If for some reason we didn't get any sets at all, just return empty to avoid errors
+        if len(sets) < 1 {
+            appendPerm(arr)
+            return
+        }
+
+        // Unexpected empty sets may break recursion, or worse. Handle them
         if len(sets[n]) == 0 {
             // Set is empty, just skip it if it's not the last one
             if n+1 <= numSets {
