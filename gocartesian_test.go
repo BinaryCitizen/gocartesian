@@ -3,6 +3,7 @@ package gocartesian
 import (
 	"testing"
 	"strings"
+	"fmt"
 )
 
 type testset struct {
@@ -58,7 +59,8 @@ func TestGetCartesianProduct(t *testing.T){
 		res := GetCartesianProduct(test.input)
 		for x, r := range res {
 			if test.expect[x] != strings.Join(r, ",") {
-				t.Error("Expected \"", test.expect[x], "\" got \"", r, "\" in case", i, "( permutation ", (x+1),")")
+				errStr := fmt.Sprintf("Expected %s but got %s in test case %d (permutation %d)", test.expect[x], strings.Join(r, ","), i, (x+1))
+				t.Error(errStr)
 			}
 		}
 	}
