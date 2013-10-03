@@ -5,60 +5,60 @@ import (
     "strings"
 )
 
-// Returns a function that, when called, will append the cartesian product from N number of arrays in s to 
-// the array results.
-func cartesianMaker(s [][]string, results *[][]string) (permute func(arr []string, n int)) {
-    sets := s
-    numSets := len(sets) - 1
-    appendPerm := func(perm []string){
-        *results = append(*results, perm)
-    }
-    
-    return func(arr []string, n int) {
+type Cartesian struct {
+    sets [][]string
+    results [][]string
+}
 
-        // If for some reason we didn't get any sets at all, just return empty to avoid errors
-        if len(sets) < 1 {
-            appendPerm(arr)
+func (c *Cartesian) appendPermutation(perm []string) {
+    c.results = append(c.results, perm)
+}
+
+func (c *Cartesian) permute(arr []string, n int) {
+
+    // If for some reason we didn't get any sets at all, just return empty to avoid errors
+    if len(c.sets) < 1 {
+        c.appendPermutation(arr)
+        return
+    }
+
+    // Unexpected empty sets may break recursion, or worse. Just skip them, unless it's the
+    // last set in which case we want to append whetever we're left with and exit
+    if len(c.sets[n]) == 0 {
+        if n+1 <= len(c.sets)-1 {
+            c.permute(arr, n+1)
+        } else {
+            c.appendPermutation(arr)
             return
         }
+    }
 
-        // Unexpected empty sets may break recursion, or worse. Handle them
-        if len(sets[n]) == 0 {
-            // Set is empty, just skip it if it's not the last one
-            if n+1 <= numSets {
-                permute(arr, n+1)
-            } else {
-                // Last set is empty, just append what we're left with from the previous one and exit
-                appendPerm(arr)
-                return
-            }
-        }
-
-        // We're not out of range and we have some data, find the permutations
-        for i, ln := 0, len(sets[n]); i < ln; i++ {
-            tmp := append(arr, sets[n][i])
-            if n < numSets {
-                permute(tmp, n+1)
-            } else {
-                appendPerm(tmp)
-            }
+    // We're not out of range and we have some data, find the permutations
+    for i, ln := 0, len(c.sets[n]); i < ln; i++ {
+        tmp := append(arr, c.sets[n][i])
+        if n < len(c.sets)-1 {
+            c.permute(tmp, n+1)
+        } else {
+            c.appendPermutation(tmp)
         }
     }
 }
 
-func getPermutations(sets [][]string) [][]string {
-    permutations := [][]string{}
-    permute := cartesianMaker(sets, &permutations)
-    permute([]string{}, 0)
-    return permutations
+func (c *Cartesian) getCartesianProduct() [][]string {
+    c.permute([]string{}, 0)
+    return c.results
 }
+
+/*-------- Public --------*/
 
 // We'll just expose this for convenience. We can use it both internally and as a way to
 // access the raw data without printing anything
 func GetCartesianProduct(sets [][]string) [][]string {
-    return getPermutations(sets)
+    cart := Cartesian{sets, [][]string{}}
+    return cart.getCartesianProduct()
 }
 
+// Will print the cartesian product of N number of arrays of strings in sets
 func PrintCartesianProduct(sets [][]string) {
     permutations := GetCartesianProduct(sets)
 
